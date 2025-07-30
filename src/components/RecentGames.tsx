@@ -22,7 +22,14 @@ const RecentGames: React.FC<Props> = ({ games }) => (
             {game.genres.map(g => <span key={g} className="bg-[#232733] text-xs text-purple-300 px-2 py-0.5 rounded-full border border-purple-700">{g}</span>)}
           </div>
           <div className="text-xs text-gray-400">{game.hoursPlayed} horas jugadas</div>
-          <div className="text-xs text-gray-400">Completado {game.completed}%</div>
+          <div className="text-xs text-gray-400 mb-1">Completado {game.completed}%</div>
+          {/* Barra de porcentaje dentro de la card */}
+          <div className="w-full h-1 bg-gray-700 rounded-full overflow-hidden mb-1">
+            <div
+              className="h-full bg-pink-500 rounded-full transition-all"
+              style={{ width: `${game.completed}%` }}
+            />
+          </div>
           <div className="text-xs text-gray-400">Logros {game.achievements}/0</div>
           <div className="text-xs text-gray-400">Última sesión {game.lastSession}</div>
         </div>
