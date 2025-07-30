@@ -1,4 +1,4 @@
-import React from 'react';
+import type { FC } from 'react';
 interface Game {
   id: string;
   title: string;
@@ -10,7 +10,7 @@ interface Game {
   image: string;
 }
 interface Props { games: Game[] }
-const RecentGames: React.FC<Props> = ({ games }) => (
+const RecentGames: FC<Props> = ({ games }) => (
   <section>
     <h2 className="text-lg font-semibold mb-4">Juegos recientes</h2>
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

@@ -1,6 +1,6 @@
-import React from 'react';
+import type { FC } from 'react';
 interface Props { recommendations: string[] }
-const Recommendations: React.FC<Props> = ({ recommendations }) => (
+const Recommendations: FC<Props> = ({ recommendations }) => (
   <section className="h-fit lg:h-full">
     <h2 className="text-lg font-semibold mb-4">Recomendados para vos</h2>
     <div className="bg-[#232733] rounded-xl shadow-md border border-gray-800 h-full flex items-center justify-center">
