@@ -26,6 +26,7 @@ function App() {
     <div className="min-h-screen bg-[#181c23] text-white font-sans">
       <NavBar />
       <div className="max-w-7xl mx-auto px-6 py-8">
+        {/* Saludo personalizado */}
         <div className="flex items-center gap-3 mb-8">
           <div className="w-10 h-10 bg-pink-600 rounded flex items-center justify-center text-xl font-bold shadow-lg">
             <span>🎮</span>
