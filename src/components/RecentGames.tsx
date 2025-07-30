@@ -15,7 +15,7 @@ const RecentGames: React.FC<Props> = ({ games }) => (
     <h2 className="text-lg font-semibold mb-4">Juegos recientes</h2>
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       {games.map(game => (
-        <div key={game.id} className="bg-[#232733] rounded-xl shadow-md border border-gray-800 p-4 flex flex-col gap-2">
+        <div key={game.id} className="card p-4 gap-2">
           <img src={game.image} alt={game.title} className="w-full h-32 object-cover rounded-lg mb-2" />
           <div className="text-base font-bold text-white mb-1">{game.title}</div>
           <div className="flex gap-2 mb-1">
