@@ -46,7 +46,7 @@ function App() {
           <ActivitySummary summary={data.activitySummary} />
         </div>
         {/* Juegos recientes y recomendaciones */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8 h-[774px]">
           <div className="lg:col-span-2">
             <RecentGames games={data.recentGames} />
           </div>

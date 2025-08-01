@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import type { Recommendation } from "../types";
+import type { RecentActivityInterface, Recommendation } from "../types";
 
 // Servicio para obtener y normalizar los datos del dashboard
 export interface DashboardData {
@@ -26,10 +26,7 @@ export interface DashboardData {
     image: string;
   }>;
   recommendations: Recommendation[];
-  recentActivity: Array<{
-    label: string;
-    description: string;
-  }>;
+  recentActivity: RecentActivityInterface[];
 }
 
 // Simulación de llamada a API y normalización
@@ -77,12 +74,12 @@ export async function fetchDashboardData(): Promise<DashboardData> {
           }))
         : [],
       recommendations: data.recomendadosIA,
-      recentActivity: Array.isArray(data.actividadRecienteIA)
-        ? data.actividadRecienteIA.map((a: any) => ({
-            label: a.nombre ?? "",
-            description: a.descripcion ?? "",
-          }))
-        : [],
+      recentActivity: data.actividadRecienteIA.map((a: any) => ({
+        label: a.nombre ?? "",
+        description: a.descripcion ?? "",
+        gameName: a.juego ?? "",
+        date: a.fecha ?? "",
+      })),
     };
   } catch (error) {
     console.error("Error fetching dashboard data:", error);
