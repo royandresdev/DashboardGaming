@@ -6,6 +6,7 @@ import ActivitySummary from './components/ActivitySummary';
 import RecentGames from './components/RecentGames';
 import Recommendations from './components/Recommendations';
 import RecentActivity from './components/RecentActivity';
+import LoginButton from './components/LoginButton';
 
 function App() {
   const [data, setData] = useState<DashboardData | null>(null);
@@ -19,7 +20,9 @@ function App() {
   }, []);
 
   if (loading || !data) {
-    return <div className="flex items-center justify-center min-h-screen bg-gray-900 text-white text-xl">Cargando...</div>;
+    return <div className="flex items-center justify-center min-h-screen bg-gray-900 text-white text-xl">
+      <LoginButton />
+    </div>;
   }
 
   return (
@@ -27,12 +30,16 @@ function App() {
       <NavBar />
       <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Saludo personalizado */}
-        <div className="flex items-center gap-3 mb-8">
-          <div className="w-10 h-10 bg-pink-600 rounded flex items-center justify-center text-xl font-bold shadow-lg">
-            <span>🎮</span>
-          </div>
-          <span className="text-lg font-semibold">¡Hola, {data.userName}!</span>
-        </div>
+        {
+          data ? (
+            <div className="flex items-center gap-3 mb-8">
+              <div className="w-10 h-10 bg-pink-600 rounded flex items-center justify-center text-xl font-bold shadow-lg overflow-hidden">
+                <img className='w-full h-full object-cover' src={data.avatar ?? ""} alt="User avatar" />
+              </div>
+              <span className="text-lg font-semibold">¡Hola, {data.userName}!</span>
+            </div>
+          ) : <LoginButton />
+        }
 
         {/* Resumen de actividad */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">

@@ -1,6 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 // Servicio para obtener y normalizar los datos del dashboard
 export interface DashboardData {
   userName: string;
+  avatar?: string;
   activitySummary: {
     totalHours: number;
     unlockedAchievements: number;
@@ -30,89 +33,61 @@ export interface DashboardData {
 // Simulación de llamada a API y normalización
 export async function fetchDashboardData(): Promise<DashboardData> {
   // Simular datos crudos de API
-  const apiRaw = {
-    user: { name: "RoyAndres" },
-    summary: {
-      total_hours: 972,
-      unlocked_achievements: 156,
-      week_hours: 26,
-      total_games: 40,
-      week_achievements: 5,
-      week_games: 1,
-      last_month_hours: 15,
-    },
-    recent_games: [
-      {
-        id: "repo",
-        title: "R.E.P.O",
-        genres: ["Horror", "Online Co-op"],
-        hours_played: 38.1,
-        completed: 0,
-        achievements: 0,
-        last_session: "Hoy",
-        image: "/public/repo.jpg",
+  const apiUrl = "http://localhost:3000/api/";
+
+  try {
+    const response = await fetch(`${apiUrl}dashboard/steam`, {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
       },
-      {
-        id: "seaofthieves",
-        title: "Sea of thieves",
-        genres: ["Horror", "Online Co-op"],
-        hours_played: 38.1,
-        completed: 0,
-        achievements: 0,
-        last_session: "Hoy",
-        image: "/public/seaofthieves.jpg",
+    });
+
+    if (!response.ok) {
+      throw new Error("Error al obtener los datos del dashboard");
+    }
+
+    const data = await response.json();
+
+    return {
+      userName: data.user?.nickname ?? "",
+      avatar: data.user?.avatar ?? "",
+      activitySummary: {
+        totalHours: data.stats?.totalPlaytimeHours ?? 0,
+        unlockedAchievements: data.stats?.totalAchievementsUnlocked ?? 0,
+        weekHours: data.stats?.playtimeLast2WeeksHours ?? 0,
+        totalGames: data.stats?.totalGames ?? 0,
+        weekAchievements: data.stats?.achievementsUnlockedLast2Weeks ?? 0,
+        weekGames: data.stats?.gamesAddedLastMonth ?? 0,
+        lastMonthHours: data.stats?.gamesAddedLastMonth ?? 0,
       },
-      {
-        id: "theforest",
-        title: "The Forest",
-        genres: ["Horror", "Online Co-op"],
-        hours_played: 38.1,
-        completed: 0,
-        achievements: 0,
-        last_session: "Hoy",
-        image: "/public/theforest.jpg",
-      },
-      {
-        id: "raft",
-        title: "RAFT",
-        genres: ["Horror", "Online Co-op"],
-        hours_played: 38.1,
-        completed: 0,
-        achievements: 0,
-        last_session: "Hoy",
-        image: "/public/raft.jpg",
-      },
-    ],
-    recommendations: ["Sugerencias IA. RECOMENDACION DE JUEGOS"],
-    recent_activity: [{ label: "Label", description: "Actividad reciente" }],
-  };
+      recentGames: Array.isArray(data.recentGamesWithDetails)
+        ? data.recentGamesWithDetails.map((g: any) => ({
+            id: g.id ?? "",
+            title: g.title ?? "",
+            genres: g.genres ?? [],
+            hoursPlayed: g.hoursPlayed ?? 0,
+            completed: g.completed ?? 0,
+            achievements: g.achievements ?? 0,
+            lastSession: g.lastSession ?? "",
+            image: g.image ?? "",
+          }))
+        : [],
+      recommendations: Array.isArray(data.recomendadosIA)
+        ? data.recomendadosIA.map((r: any) => r.nombre ?? "")
+        : [],
+      recentActivity: Array.isArray(data.actividadRecienteIA)
+        ? data.actividadRecienteIA.map((a: any) => ({
+            label: a.nombre ?? "",
+            description: a.descripcion ?? "",
+          }))
+        : [],
+    };
+  } catch (error) {
+    console.error("Error fetching dashboard data:", error);
+    throw error;
+  }
 
   // Normalización
-  return {
-    userName: apiRaw.user.name,
-    activitySummary: {
-      totalHours: apiRaw.summary.total_hours,
-      unlockedAchievements: apiRaw.summary.unlocked_achievements,
-      weekHours: apiRaw.summary.week_hours,
-      totalGames: apiRaw.summary.total_games,
-      weekAchievements: apiRaw.summary.week_achievements,
-      weekGames: apiRaw.summary.week_games,
-      lastMonthHours: apiRaw.summary.last_month_hours,
-    },
-    recentGames: apiRaw.recent_games.map((g) => ({
-      id: g.id,
-      title: g.title,
-      genres: g.genres,
-      hoursPlayed: g.hours_played,
-      completed: g.completed,
-      achievements: g.achievements,
-      lastSession: g.last_session,
-      image: g.image,
-    })),
-    recommendations: apiRaw.recommendations,
-    recentActivity: apiRaw.recent_activity.map((a) => ({
-      label: a.label,
-      description: a.description,
-    })),
-  };
 }
