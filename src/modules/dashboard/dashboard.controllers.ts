@@ -79,9 +79,10 @@ const dashboard = async (req: Request, res: Response): Promise<void> => {
           unlocked.forEach((a: any) => {
             if (a.unlocktime >= now - (14 * 24 * 60 * 60)) {
               totalAchievementsUnlocked2Weeks++;
+              const meta = schemaAchievements.find((m: any) => m.name === a.apiname);
               rawActivities.push({
                 nombre: "LOGRO DESBLOQUEADO",
-                descripcion: a.apiname,
+                descripcion: meta?.displayName || a.apiname, // ✅ Nombre correcto
                 juego: game.name,
                 fecha: new Date(a.unlocktime * 1000).toLocaleDateString('es-AR')
               });
@@ -109,7 +110,7 @@ const dashboard = async (req: Request, res: Response): Promise<void> => {
 
         if (game.playtime_2weeks && game.playtime_2weeks > 0) {
           rawActivities.push({
-            nombre: "TIEMPO DE JUEGO",
+            nombre: "PLAYTIME",
             descripcion: `Jugaste ${Math.round(game.playtime_2weeks / 60)} horas`,
             juego: game.name,
             fecha: new Date().toLocaleDateString('es-AR')
@@ -145,37 +146,57 @@ const dashboard = async (req: Request, res: Response): Promise<void> => {
       }
     });
 
-    // 🧩 ACTIVIDAD IA: JSON -> texto IA -> rawActivities
-    const actividadPrompt = `
-      A partir de estos datos:
-      ${JSON.stringify(rawActivities)}
-
-      Genera una lista JSON de objetos:
-      [
-        { "nombre": "LOGRO DESBLOQUEADO", "descripcion": "Completaste el Capítulo 1", "juego": "Labyrinthine", "fecha": "23/07/2025" },
-        { "nombre": "PLAYTIME", "descripcion": "Jugaste por 5 horas", "juego": "Rust", "fecha": "23/07/2025" }
-      ]
-      Responde SOLO con JSON en español.
-    `;
     let actividadReciente: any[] | string = [];
-    try {
-      const actividadGenerada = await generateContentWithRetry(actividadPrompt);
-      let actividadRaw = actividadGenerada?.response?.candidates?.[0]?.content?.parts?.[0]?.text || "";
-      actividadRaw = actividadRaw.replace(/```(json|python)?/gi, "").trim();
+    if (rawActivities.length > 0) {
+      const actividadPrompt = `
+        A partir de estos datos:
+        ${JSON.stringify(rawActivities)}
 
-      const jsonMatch = actividadRaw.match(/\[.*\]/s);
-      if (jsonMatch) {
-        actividadReciente = JSON.parse(jsonMatch[0]);
-      } else if (actividadRaw) {
-        console.warn("⚠️ No se pudo parsear JSON, devolviendo texto IA");
-        actividadReciente = actividadRaw;
-      } else {
-        console.warn("⚠️ No hay texto IA, usando rawActivities");
+        Genera una lista JSON que incluya:
+        - "PLAYTIME" solo si ya está.
+        - "LOGRO DESBLOQUEADO" solo si ya está.
+        - Además, analiza y genera uno o más "HITO DESBLOQUEADO" realistas,
+          basados en el total jugado o logros, con una frase motivadora.
+        Si no puedes generar hitos nuevos, devuelve solo lo que haya.
+        Formato:
+        [
+          {
+            "nombre": "PLAYTIME",
+            "descripcion": "Jugaste 5 horas esta semana",
+            "juego": "Rust",
+            "fecha": "23/07/2025"
+          },
+          {
+            "nombre": "HITO DESBLOQUEADO",
+            "descripcion": "Completaste una sesión larga",
+            "juego": "Rust",
+            "fecha": "23/07/2025"
+          }
+        ]
+        Responde SOLO con JSON en español.
+      `;
+
+      try {
+        const actividadGenerada = await generateContentWithRetry(actividadPrompt);
+        let actividadRaw = actividadGenerada?.response?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+        actividadRaw = actividadRaw.replace(/```(json|python)?/gi, "").trim();
+
+        const jsonMatch = actividadRaw.match(/\[.*\]/s);
+        if (jsonMatch) {
+          actividadReciente = JSON.parse(jsonMatch[0]);
+        } else if (actividadRaw) {
+          console.warn("⚠️ No se pudo parsear JSON, devolviendo texto IA");
+          actividadReciente = actividadRaw;
+        } else {
+          console.warn("⚠️ No hay texto IA, usando rawActivities tal cual");
+          actividadReciente = rawActivities;
+        }
+      } catch (err) {
+        console.warn("❗ Error generando actividad IA:", err);
         actividadReciente = rawActivities;
       }
-    } catch (err) {
-      console.warn("❗ Error generando actividad IA:", err);
-      actividadReciente = rawActivities;
+    } else {
+      actividadReciente = [];
     }
 
     const tagsRecientes = recentWithDetails.flatMap(g => g.tags).filter(Boolean);
@@ -237,4 +258,3 @@ const dashboard = async (req: Request, res: Response): Promise<void> => {
 };
 
 export default { dashboard };
-

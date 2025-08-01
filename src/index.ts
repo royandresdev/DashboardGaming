@@ -32,6 +32,7 @@ app.use(cookieParser());
 app.use(morgan('dev'));
 app.use(cors({
   origin: '*',
+   credentials: true, // Permite enviar cookies de sesión
   methods: ['GET', 'POST'],
 }));
 app.use(session({
