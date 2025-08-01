@@ -7,5 +7,5 @@
 }
 
 @utility tag {
-  @apply bg-[#4C4160] text-[#CE52ED] border border-[#CE52ED] text-xs px-3 py-1 rounded-full line-clamp-1;
+  @apply bg-[#4C4160] text-[#CE52ED] border border-[#CE52ED] text-xs px-3 py-1 rounded-full line-clamp-1 w-fit;
 }
