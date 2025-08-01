@@ -50,11 +50,11 @@ function App() {
           <div className="lg:col-span-2">
             <RecentGames games={data.recentGames} />
           </div>
-          <Recommendations recommendations={data.recommendations} />
+          <RecentActivity activity={data.recentActivity} />
         </div>
         {/* Actividad reciente */}
-        <div className="grid grid-cols-1 gap-6">
-          <RecentActivity activity={data.recentActivity} />
+        <div className="">
+          <Recommendations recommendations={data.recommendations} />
         </div>
       </div>
     </div>

@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+import type { Recommendation } from "../types";
+
 // Servicio para obtener y normalizar los datos del dashboard
 export interface DashboardData {
   userName: string;
@@ -23,7 +25,7 @@ export interface DashboardData {
     lastSession: string;
     image: string;
   }>;
-  recommendations: string[];
+  recommendations: Recommendation[];
   recentActivity: Array<{
     label: string;
     description: string;
@@ -74,9 +76,7 @@ export async function fetchDashboardData(): Promise<DashboardData> {
             image: g.image ?? "",
           }))
         : [],
-      recommendations: Array.isArray(data.recomendadosIA)
-        ? data.recomendadosIA.map((r: any) => r.nombre ?? "")
-        : [],
+      recommendations: data.recomendadosIA,
       recentActivity: Array.isArray(data.actividadRecienteIA)
         ? data.actividadRecienteIA.map((a: any) => ({
             label: a.nombre ?? "",

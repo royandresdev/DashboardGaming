@@ -5,3 +5,7 @@
 @utility card-icon {
   @apply absolute top-4 right-4 text-cyan-400 text-xl;
 }
+
+@utility tag {
+  @apply bg-[#4C4160] text-[#CE52ED] border border-[#CE52ED] text-xs px-3 py-1 rounded-full line-clamp-1;
+}
